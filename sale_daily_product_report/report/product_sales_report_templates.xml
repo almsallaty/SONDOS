@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="product_sales_report_document">
+        <t t-call="web.html_container">
+            <t t-call="sale_daily_product_report.product_sales_report_body" t-lang="report_lang"/>
+        </t>
+    </template>
+
+    <template id="product_sales_report_body">
+        <t t-call="web.basic_layout">
+                <div class="page psr-page" t-att-dir="'rtl' if is_rtl else 'ltr'" t-att-lang="report_lang">
+                    <style>
+                        .psr-page {
+                            background: #ffffff;
+                            color: #262126;
+                            font-family: Arial, 'Liberation Sans', 'DejaVu Sans', sans-serif;
+                            font-size: 13px;
+                            line-height: 1.5;
+                            padding: 2px 0 0;
+                        }
+                        .psr-page, .psr-page * { box-sizing: border-box; }
+                        .psr-header {
+                            text-align: center;
+                            margin: 0 0 18px;
+                        }
+                        .psr-title {
+                            margin: 0;
+                            color: #714B67;
+                            font-size: 25px;
+                            font-weight: 700;
+                            line-height: 1.25;
+                        }
+                        .psr-period {
+                            margin-top: 7px;
+                            color: #5f5860;
+                            font-size: 13px;
+                            font-weight: 600;
+                        }
+                        .psr-period-label { color: #714B67; font-weight: 700; }
+                        .psr-meta-card {
+                            width: 100%;
+                            margin: 0 0 16px;
+                            border: 1px solid #ded5dc;
+                            border-radius: 9px;
+                            border-collapse: separate;
+                            border-spacing: 0;
+                            overflow: hidden;
+                        }
+                        .psr-meta-card td {
+                            width: 50%;
+                            padding: 10px 14px;
+                            text-align: center;
+                            vertical-align: middle;
+                            font-size: 12.5px;
+                        }
+                        .psr-meta-card td + td { border-left: 1px solid #eee8ec; }
+                        [dir='rtl'] .psr-meta-card td + td { border-left: 0; border-right: 1px solid #eee8ec; }
+                        .psr-meta-label { color: #714B67; font-weight: 700; }
+                        .psr-summary-shell {
+                            border: 1px solid #ded5dc;
+                            border-radius: 10px;
+                            padding: 5px 0;
+                            margin-bottom: 18px;
+                        }
+                        .psr-summary {
+                            width: 100%;
+                            border-collapse: collapse;
+                            table-layout: fixed;
+                        }
+                        .psr-summary td {
+                            width: 25%;
+                            padding: 10px 9px 11px;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+                        .psr-summary td + td { border-left: 1px solid #eee8ec; }
+                        [dir='rtl'] .psr-summary td + td { border-left: 0; border-right: 1px solid #eee8ec; }
+                        .psr-summary-label {
+                            min-height: 34px;
+                            color: #6f6670;
+                            font-size: 11.5px;
+                            font-weight: 700;
+                            line-height: 1.35;
+                        }
+                        .psr-summary-value {
+                            padding-top: 5px;
+                            color: #302a30;
+                            font-size: 18px;
+                            font-weight: 700;
+                            line-height: 1.25;
+                            white-space: nowrap;
+                        }
+                        .psr-table-shell {
+                            border: 1px solid #d8cfd6;
+                            border-radius: 10px;
+                            overflow: hidden;
+                        }
+                        .psr-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            table-layout: fixed;
+                            page-break-inside: auto;
+                        }
+                        .psr-table thead { display: table-header-group; }
+                        .psr-table tr { page-break-inside: avoid; page-break-after: auto; }
+                        .psr-table th {
+                            background: #714B67;
+                            color: #ffffff;
+                            border: 0;
+                            padding: 10px 6px;
+                            text-align: center;
+                            vertical-align: middle;
+                            font-size: 11.5px;
+                            font-weight: 700;
+                            line-height: 1.35;
+                            white-space: normal;
+                        }
+                        .psr-table td {
+                            border: 0;
+                            border-bottom: 1px solid #eee8ec;
+                            padding: 9px 7px;
+                            vertical-align: middle;
+                            font-size: 12.2px;
+                            line-height: 1.45;
+                            background: #ffffff;
+                        }
+                        .psr-table tbody tr:nth-child(even) td { background: #fbf9fa; }
+                        .psr-number { width: 5%; text-align: center; }
+                        .psr-product { width: 35%; }
+                        .psr-code { width: 12%; text-align: center; direction: ltr; unicode-bidi: embed; }
+                        .psr-orders { width: 10%; text-align: center; direction: ltr; unicode-bidi: embed; }
+                        .psr-qty { width: 12%; text-align: center; direction: ltr; unicode-bidi: embed; white-space: nowrap; }
+                        .psr-uom { width: 12%; text-align: center; }
+                        .psr-money { width: 14%; text-align: center; direction: ltr; unicode-bidi: embed; white-space: nowrap; }
+                        [dir='rtl'] td.psr-product { text-align: right; direction: rtl; unicode-bidi: plaintext; }
+                        [dir='ltr'] td.psr-product { text-align: left; direction: ltr; }
+                        .psr-total-row td {
+                            background: #f7f2f5 !important;
+                            border-bottom: 0;
+                            border-top: 2px solid #714B67;
+                            padding-top: 11px;
+                            padding-bottom: 11px;
+                            font-size: 13px;
+                            font-weight: 700;
+                        }
+                        .psr-total-label { text-align: center; color: #714B67; }
+                        .psr-empty {
+                            padding: 28px 10px !important;
+                            text-align: center;
+                            color: #6d656c;
+                            font-size: 13px !important;
+                        }
+                    </style>
+
+                    <div class="psr-header">
+                    <h1 class="psr-title">
+                        <t t-if="period_type == 'day'">Daily Product Sales Report</t>
+                        <t t-elif="period_type == 'week'">Weekly Product Sales Report</t>
+                        <t t-elif="period_type == 'month'">Monthly Product Sales Report</t>
+                        <t t-else="">Product Sales Report</t>
+                    </h1>
+                    <div class="psr-period">
+                        <span class="psr-period-label">Reporting Period:</span>
+                        <span t-out="date_from_display"/>
+                        <span> — </span>
+                        <span t-out="date_to_display"/>
+                    </div>
+                    </div>
+
+                    <table class="psr-meta-card">
+                        <tr>
+                            <td>
+                                <span class="psr-meta-label">Printed By:</span>
+                                <span t-out="printed_by.name"/>
+                            </td>
+                            <td>
+                                <span class="psr-meta-label">Company Currency:</span>
+                                <span t-out="currency.name"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="psr-summary-shell">
+                    <table class="psr-summary">
+                        <tr>
+                            <td>
+                                <div class="psr-summary-label">Confirmed Sales Orders</div>
+                                <div class="psr-summary-value" t-out="order_count"/>
+                            </td>
+                            <td>
+                                <div class="psr-summary-label">Products Sold</div>
+                                <div class="psr-summary-value" t-out="product_count"/>
+                            </td>
+                            <td>
+                                <div class="psr-summary-label">Total Sales Amount</div>
+                                <div class="psr-summary-value">
+                                    <span t-out="total_sales" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="psr-summary-label">Average Order Value</div>
+                                <div class="psr-summary-value">
+                                    <span t-out="average_order_value" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    </div>
+
+                    <div class="psr-table-shell">
+                    <table class="psr-table">
+                        <thead>
+                            <tr>
+                                <th class="psr-number">No.</th>
+                                <th class="psr-product">Product</th>
+                                <th class="psr-code">Internal Reference</th>
+                                <th class="psr-orders">Number of Orders</th>
+                                <th class="psr-qty">Sold Quantity</th>
+                                <th class="psr-uom">Unit of Measure</th>
+                                <th class="psr-money">Sales Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="report_lines">
+                                <tr t-foreach="report_lines" t-as="line">
+                                    <td class="psr-number"><span t-out="line_index + 1"/></td>
+                                    <td class="psr-product"><span t-out="line['product'].display_name"/></td>
+                                    <td class="psr-code"><span t-out="line['default_code']"/></td>
+                                    <td class="psr-orders"><span t-out="line['order_count']"/></td>
+                                    <td class="psr-qty"><span t-out="line['quantity']" t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/></td>
+                                    <td class="psr-uom"><span t-out="line['uom'].name"/></td>
+                                    <td class="psr-money"><span t-out="line['sales_total']" t-options="{'widget': 'monetary', 'display_currency': currency}"/></td>
+                                </tr>
+                                <tr class="psr-total-row">
+                                    <td colspan="6" class="psr-total-label">Final Total</td>
+                                    <td class="psr-money"><span t-out="total_sales" t-options="{'widget': 'monetary', 'display_currency': currency}"/></td>
+                                </tr>
+                            </t>
+                            <tr t-else="">
+                                <td colspan="7" class="psr-empty">No confirmed sales were found for the selected period.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+        </t>
+    </template>
+</odoo>
